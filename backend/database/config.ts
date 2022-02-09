@@ -7,7 +7,13 @@ const db = new Sequelize(
   {
     host: "localhost",
     dialect: "postgres",
-    /*  logging: false, */
+    pool: {
+      max: 520,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
+    /* logging: false, */
   }
 );
 
