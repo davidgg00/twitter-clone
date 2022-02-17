@@ -33,7 +33,11 @@ function dbConnection() {
 dbConnection();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
+app.use(express_1.default.static("public"));
 app.use("/api/user", require("./routes/user"));
+app.use("/api/followers", require("./routes/follower"));
+app.use("/api/tweet", require("./routes/tweet"));
+app.use("/api/notification", require("./routes/notification"));
 const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
