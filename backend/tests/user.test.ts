@@ -72,3 +72,5 @@ describe("Post Endpoints", () => {
     server.close();
   });
 });
+
+export {};

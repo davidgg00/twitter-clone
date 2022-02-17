@@ -16,6 +16,7 @@ exports.deleteUser = exports.updateUser = exports.getUser = exports.login = expo
 const User_1 = __importDefault(require("../models/User"));
 const jwt_1 = require("../helpers/jwt");
 const bcrypt = require("bcryptjs");
+const fs = require("fs");
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield User_1.default.findAll();
@@ -90,7 +91,34 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getUser = getUser;
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield User_1.default.findByPk(req.params.id);
+        const files = req.files;
+        const user = (yield User_1.default.findByPk(req.params.id));
+        if (files) {
+            if (files["profile_image_url"]) {
+                fs.renameSync(files["profile_image_url"][0].path, files["profile_image_url"][0].path +
+                    "." +
+                    files["profile_image_url"][0].mimetype.split("/")[1]);
+                req.body.profile_image_url =
+                    files["profile_image_url"][0].filename +
+                        "." +
+                        files["profile_image_url"][0].mimetype.split("/")[1];
+                if (user.profile_image_url) {
+                    fs.unlinkSync("public/images/" + user.profile_image_url);
+                }
+            }
+            if (files["background_image_url"]) {
+                fs.renameSync(files["background_image_url"][0].path, files["background_image_url"][0].path +
+                    "." +
+                    files["background_image_url"][0].mimetype.split("/")[1]);
+                req.body.background_image_url =
+                    files["background_image_url"][0].filename +
+                        "." +
+                        files["background_image_url"][0].mimetype.split("/")[1];
+                if (user.background_image_url) {
+                    fs.unlinkSync("public/images/" + user.background_image_url);
+                }
+            }
+        }
         if (user) {
             yield user.update(req.body);
             res.json({
@@ -103,6 +131,7 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     catch (error) {
         res.status(500).json({ message: error.message });
+        console.log(error);
     }
 });
 exports.updateUser = updateUser;
@@ -123,6 +152,7 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
     catch (error) {
+        console.log(error);
         res.status(500).json({ message: error.message });
     }
 });

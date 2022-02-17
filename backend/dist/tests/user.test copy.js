@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 const supertest = require("supertest");
 const { app, server } = require("../server");
 const api = supertest(app);
@@ -77,4 +76,4 @@ describe("Post Endpoints", () => {
         server.close();
     });
 });
-//# sourceMappingURL=user.test.js.map
+//# sourceMappingURL=user.test%20copy.js.map

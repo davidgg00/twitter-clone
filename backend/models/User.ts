@@ -1,59 +1,77 @@
-import { DataTypes } from "sequelize";
-import db from "../database/config";
+import {
+  AllowNull,
+  AutoIncrement,
+  Column,
+  NotEmpty,
+  PrimaryKey,
+  Table,
+  Model,
+  HasMany,
+} from "sequelize-typescript";
+import Tweet from "./Tweet";
 
-const Users = db.define("user", {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  first_name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  last_name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  dob: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    get() {
-      return () => {};
-    },
-  },
-  profile_image_url: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  background_image_url: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  bio: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-});
+@Table({
+  tableName: "users",
+  timestamps: true,
+})
+export default class User extends Model<User> {
+  @AutoIncrement
+  @PrimaryKey
+  @Column
+  public id!: number;
 
-export default Users;
+  @AllowNull(false)
+  @NotEmpty
+  @Column
+  public first_name!: string;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Column
+  public last_name!: string;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Column
+  public dob!: Date;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Column
+  public username!: string;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Column
+  public password!: string;
+
+  @AllowNull(true)
+  @Column
+  public profile_image_url?: string;
+
+  @AllowNull(true)
+  @Column
+  public background_image_url?: string;
+
+  @AllowNull(true)
+  @Column
+  public bio?: string;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Column
+  public email!: string;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Column
+  public createdAt!: Date;
+
+  @AllowNull(false)
+  @NotEmpty
+  @Column
+  public updatedAt!: Date;
+
+  @HasMany(() => Tweet)
+  public tweets!: Tweet[];
+}

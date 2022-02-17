@@ -1,4 +1,8 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
+import Follower from "../models/Follower";
+import Tweet from "../models/Tweet";
+import User from "../models/User";
+import Notification from "../models/Notification";
 
 const db = new Sequelize(
   String(process.env.DATABASE_NAME),
@@ -16,5 +20,7 @@ const db = new Sequelize(
     /* logging: false, */
   }
 );
+
+db.addModels([User, Tweet, Follower, Notification]);
 
 export default db;

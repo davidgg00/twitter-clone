@@ -2,6 +2,7 @@ import User from "../models/User";
 import { Request, Response } from "express";
 import { generateJWT } from "../helpers/jwt";
 const bcrypt = require("bcryptjs");
+const fs = require("fs");
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -75,7 +76,43 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+    const user = (await User.findByPk(req.params.id)) as User;
+
+    if (files) {
+      if (files["profile_image_url"]) {
+        fs.renameSync(
+          files["profile_image_url"][0].path,
+          files["profile_image_url"][0].path +
+            "." +
+            files["profile_image_url"][0].mimetype.split("/")[1]
+        );
+        req.body.profile_image_url =
+          files["profile_image_url"][0].filename +
+          "." +
+          files["profile_image_url"][0].mimetype.split("/")[1];
+        if (user.profile_image_url) {
+          fs.unlinkSync("public/images/" + user.profile_image_url);
+        }
+      }
+      if (files["background_image_url"]) {
+        fs.renameSync(
+          files["background_image_url"][0].path,
+          files["background_image_url"][0].path +
+            "." +
+            files["background_image_url"][0].mimetype.split("/")[1]
+        );
+        req.body.background_image_url =
+          files["background_image_url"][0].filename +
+          "." +
+          files["background_image_url"][0].mimetype.split("/")[1];
+
+        if (user.background_image_url) {
+          fs.unlinkSync("public/images/" + user.background_image_url);
+        }
+      }
+    }
     if (user) {
       await user.update(req.body);
       res.json({
@@ -86,6 +123,7 @@ export const updateUser = async (req: Request, res: Response) => {
     }
   } catch (error: any) {
     res.status(500).json({ message: error.message });
+    console.log(error);
   }
 };
 
@@ -104,6 +142,7 @@ export const deleteUser = async (req: Request, res: Response) => {
       res.status(404).json({ message: "User not found" });
     }
   } catch (error: any) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
