@@ -46,11 +46,14 @@ export const login = async (req: Request, res: Response) => {
         username: req.body.username,
       },
     });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
     const isMatch = await bcrypt.compare(
       req.body.password,
       user?.getDataValue("password")
     );
-    if (isMatch && user) {
+    if (isMatch) {
       const idToken = generateJWT(user);
       res.json({ user, idToken });
     } else {

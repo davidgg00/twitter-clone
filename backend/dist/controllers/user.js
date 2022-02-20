@@ -60,8 +60,11 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 username: req.body.username,
             },
         });
+        if (!user) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
         const isMatch = yield bcrypt.compare(req.body.password, user === null || user === void 0 ? void 0 : user.getDataValue("password"));
-        if (isMatch && user) {
+        if (isMatch) {
             const idToken = (0, jwt_1.generateJWT)(user);
             res.json({ user, idToken });
         }
