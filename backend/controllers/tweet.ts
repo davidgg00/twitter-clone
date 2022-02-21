@@ -1,7 +1,9 @@
 import Tweet from "../models/Tweet";
 import Follower from "../models/Follower";
 import { Request, Response } from "express";
+import User from "../models/User";
 const fs = require("fs");
+const { Op } = require("sequelize");
 
 export const createTweet = async (req: Request, res: Response) => {
   try {
@@ -15,9 +17,20 @@ export const createTweet = async (req: Request, res: Response) => {
     }
     const tweet = await Tweet.create(req.body);
     if (tweet) {
+      const tweet_userInfo = await Tweet.findOne({
+        where: {
+          id: tweet.id,
+        },
+        include: [
+          {
+            model: User,
+            as: "user",
+          },
+        ],
+      });
       res.status(200).json({
         message: "Tweet created successfully",
-        tweet,
+        tweet: tweet_userInfo,
       });
     } else {
       res.status(400).json({
@@ -46,6 +59,12 @@ export const getAllUserTweets = async (req: Request, res: Response) => {
     where: {
       user_id: req.params.id,
     },
+    include: [
+      {
+        model: User,
+        as: "user",
+      },
+    ],
   });
   res.json(tweets);
 };
@@ -57,12 +76,20 @@ export const getTweetsfollowingUsers = async (req: Request, res: Response) => {
     },
   });
 
-  const tweets = await Tweet.findAll();
-
-  const tweetsFollowing = tweets.filter((tweet) => {
-    return getFollowing.some((following) => {
-      return following.user_id === tweet.user_id;
-    });
+  const tweets = await Tweet.findAll({
+    where: {
+      [Op.or]: [
+        { user_id: getFollowing.map((following) => following.user_id) },
+        { user_id: req.params.id },
+      ],
+    },
+    include: [
+      {
+        model: User,
+        as: "user",
+      },
+    ],
   });
-  res.json(tweetsFollowing);
+
+  res.json(tweets);
 };
