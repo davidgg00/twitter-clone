@@ -3,17 +3,18 @@ import backendApiConnection from '../api/backendApiConnection'
 import Cookie from 'js-cookie'
 import User from '../../backend/models/User'
 export const state = () => ({
-  user: {},
+  info: {},
   token: '',
 })
 
 export const mutations = {
-  setUser(state: { user: any; token: any }, data: { user: any; idToken: any }) {
-    state.user = data.user
+  setUser(state: { info: any; token: any }, data: { user: any; idToken: any }) {
+    state.info = data.user
     state.token = data.idToken
   },
-  logout(state: { user: {}; token: string }) {
-    state.user = {}
+  logout(state: { info: {}; token: string }) {
+    console.log('entro aquii')
+    state.info = {}
     state.token = ''
   },
 }

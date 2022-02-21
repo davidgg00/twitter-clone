@@ -89,6 +89,7 @@ export const getTweetsfollowingUsers = async (req: Request, res: Response) => {
         as: "user",
       },
     ],
+    order: [["createdAt", "DESC"]],
   });
 
   res.json(tweets);
