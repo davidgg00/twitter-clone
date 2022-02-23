@@ -42,6 +42,10 @@ export const getFollowingByUserId = async (req: Request, res: Response) => {
           model: User,
           as: "user",
         },
+        {
+          model: User,
+          as: "follower",
+        },
       ],
     });
     if (following) {

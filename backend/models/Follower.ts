@@ -20,7 +20,10 @@ export default class Follower extends Model<Follower> {
   @Column
   public user_id!: number;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, {
+    foreignKey: "user_id",
+    as: "user",
+  })
   public user!: User;
 
   @PrimaryKey
@@ -28,7 +31,10 @@ export default class Follower extends Model<Follower> {
   @Column
   public follower_id!: number;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, {
+    as: "follower",
+    foreignKey: "follower_id",
+  })
   public follower!: User;
 
   @AllowNull(false)

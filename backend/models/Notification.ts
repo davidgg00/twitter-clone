@@ -26,14 +26,20 @@ export default class Notification extends Model<Notification> {
   @Column
   public user_id!: number;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, {
+    foreignKey: "user_id",
+    as: "user",
+  })
   public user!: User;
 
   @ForeignKey(() => User)
   @Column
   public user_id_send!: number;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, {
+    as: "user_send",
+    foreignKey: "user_id_send",
+  })
   public user_send!: User;
 
   @ForeignKey(() => Tweet)

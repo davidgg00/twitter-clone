@@ -78,4 +78,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.wrapperImage img {
+  border-radius: 50%;
+}
+</style>

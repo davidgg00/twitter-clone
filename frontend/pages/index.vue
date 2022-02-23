@@ -7,7 +7,12 @@
     <FormTweet v-on:send-tweet="sendTweet" />
 
     <div class="wrapperTweet">
-      <Tweet v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
+      <Tweet
+        v-for="tweet in tweets"
+        :key="tweet.id"
+        :tweet="tweet"
+        v-on:removeTweet="removeTweet"
+      />
     </div>
   </div>
 </template>
@@ -16,6 +21,7 @@
 import Vue from 'vue'
 import FormTweet from '../components/FormTweet.vue'
 import backendApiConnection from '../api/backendApiConnection'
+import Tweet from '../../backend/models/Tweet'
 
 export default Vue.extend({
   middleware: 'auth',
@@ -28,7 +34,7 @@ export default Vue.extend({
   data() {
     return {
       user: {},
-      tweets: {},
+      tweets: [],
     }
   },
   methods: {
@@ -48,11 +54,12 @@ export default Vue.extend({
         )
         this.tweets = data
       } catch (error: any) {
+        console.log('----1')
         console.log(error)
         return error
       }
     },
-    async sendTweet(content) {
+    async sendTweet(content = '') {
       try {
         const { data } = await backendApiConnection.post(
           'tweet/send',
@@ -68,12 +75,15 @@ export default Vue.extend({
         )
         console.log(data)
         console.log(this.tweets)
-        this.tweets.unshift(data.tweet)
-        this.tweet = ''
+        this.tweets.unshift(data.tweet as never)
       } catch (error) {
+        console.log('----6')
         console.log(error)
         return error
       }
+    },
+    removeTweet(tweetId: { id: number }) {
+      this.tweets = this.tweets.filter((x: { id: Tweet }) => x.id !== tweetId)
     },
   },
 })
@@ -99,7 +109,6 @@ header h4 {
 .wrapperTweet {
   width: 100%;
   background: #fff;
-  padding: 20px;
   border: 1px solid gray;
 }
 </style>

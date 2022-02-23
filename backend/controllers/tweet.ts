@@ -1,5 +1,6 @@
 import Tweet from "../models/Tweet";
 import Follower from "../models/Follower";
+import Notification from "../models/Notification";
 import { Request, Response } from "express";
 import User from "../models/User";
 const fs = require("fs");
@@ -69,6 +70,26 @@ export const getAllUserTweets = async (req: Request, res: Response) => {
   res.json(tweets);
 };
 
+const getLikes = async (tweet_id: number) => {
+  const likes = await Notification.findAll({
+    where: {
+      tweet_id,
+      type: "like",
+    },
+  });
+  return likes;
+};
+
+const getRetweets = async (tweet_id: number) => {
+  const retweets = await Notification.findAll({
+    where: {
+      tweet_id,
+      type: "retweet",
+    },
+  });
+  return retweets;
+};
+
 export const getTweetsfollowingUsers = async (req: Request, res: Response) => {
   const getFollowing = await Follower.findAll({
     where: {
@@ -92,5 +113,18 @@ export const getTweetsfollowingUsers = async (req: Request, res: Response) => {
     order: [["createdAt", "DESC"]],
   });
 
-  res.json(tweets);
+  const tweetsWithRtLikes = await Promise.all(
+    tweets.map(async (tweet) => {
+      const nlikes = await getLikes(tweet.id);
+      const nRetweets = await getRetweets(tweet.id);
+      const fulltweet = JSON.parse(JSON.stringify(tweet));
+      fulltweet.likes = nlikes;
+      fulltweet.retweets = nRetweets;
+      return {
+        ...fulltweet,
+      };
+    })
+  );
+
+  res.json(tweetsWithRtLikes);
 };
