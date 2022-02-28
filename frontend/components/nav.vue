@@ -5,10 +5,14 @@
         src="http://assets.stickpng.com/images/580b57fcd9996e24bc43c53e.png"
         alt=""
       />
-      <a href="#"><i class="fa-solid fa-house"></i>Home</a>
-      <a href="#"><i class="fa-solid fa-bell"></i>Notifications</a
-      ><a href="#"><i class="fa-solid fa-user"></i>Profile</a
-      ><a href="#"
+      <NuxtLink to="/"><i class="fa-solid fa-house"></i>Home</NuxtLink>
+      <a href="#"
+        ><i class="fa-solid fa-bell"></i>Notifications ({{
+          newNotifications
+        }})</a
+      >
+      <NuxtLink to="/profile"><i class="fa-solid fa-user"></i>Profile</NuxtLink>
+      <a @click="logout"
         ><i class="fa-solid fa-arrow-right-from-bracket"></i>Logout</a
       >
     </nav>
@@ -16,7 +20,31 @@
 </template>
 
 <script>
-export default {}
+import backendApiConnection from '../api/backendApiConnection'
+export default {
+  data() {
+    return {
+      newNotifications: 0,
+    }
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch('user/logout')
+      this.$router.push('/login')
+    },
+  },
+  created() {
+    backendApiConnection
+      .get('/notification/getNew/' + this.$store.state.user.info.id, {
+        headers: {
+          'x-auth-token': this.$store.state.user.token,
+        },
+      })
+      .then((response) => {
+        this.newNotifications = response.data.length
+      })
+  },
+}
 </script>
 
 <style scoped>
@@ -41,6 +69,7 @@ a {
 
 a:hover {
   color: #e27894;
+  cursor: pointer;
 }
 
 a i {

@@ -35,6 +35,7 @@ export default {
         )
         this.users = data
       } catch (error) {
+        console.log('----2')
         console.log(error)
         return error
       }
@@ -63,7 +64,7 @@ body {
   border: 1px solid gray;
 }
 
-img {
+.wrapperUsers img {
   width: 100px;
 }
 

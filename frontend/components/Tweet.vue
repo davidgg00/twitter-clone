@@ -172,6 +172,11 @@ export default {
             )
             if (response.status === 200) {
               this.$emit('removeTweet', this.tweet.id)
+              this.$swal.fire(
+                'Deleted!',
+                'Your tweet has been deleted.',
+                'success'
+              )
             }
           }
         })
