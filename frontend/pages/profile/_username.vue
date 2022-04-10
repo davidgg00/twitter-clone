@@ -2,10 +2,10 @@
   <div class="profileWrapper">
     <div class="shortInfo">
       <h4>
-        {{ $store.state.user.info.first_name }}
-        {{ $store.state.user.info.last_name }}
+        {{ user.first_name }}
+        {{ user.last_name }}
       </h4>
-      <p id="totalTweets">3 Tweets</p>
+      <p id="totalTweets">{{ tweets.length }} Tweets</p>
     </div>
     <div class="profile">
       <div class="background">
@@ -23,22 +23,23 @@
             />
           </div>
           <div class="profileName">
-            <h4>
-              {{ $store.state.user.info.first_name }}
-              {{ $store.state.user.info.last_name }}
-            </h4>
-            <p id="username">@username</p>
-            <p>Biography</p>
+            <div class="row">
+              <h4>
+                {{ user.first_name }}
+                {{ user.last_name }}
+              </h4>
+            </div>
+            <p id="username">@{{ user.username }}</p>
+            <p v-if="user.bio === null">Biography</p>
+            <p v-else>{{ user.bio }}</p>
           </div>
           <div class="infoFollower">
             <div class="info">
-              <span id="following"
-                >{{ user.info.totalFollowing }} Following</span
+              <span id="following" @click="showFollowingUsers"
+                >{{ user.totalFollowing }} Following</span
               >
 
-              <span id="followers"
-                >{{ user.info.totalFollowers }} Followers</span
-              >
+              <span id="followers">{{ user.totalFollowers }} Followers</span>
             </div>
           </div>
         </div>
@@ -58,38 +59,36 @@
 </template>
 
 <script>
-import backendApiConnection from '../api/backendApiConnection'
+import backendApiConnection from '../../api/backendApiConnection'
 export default {
   data() {
     return {
       tweets: [],
-      user: {
-        info: {
-          id: '',
-          first_name: '',
-          last_name: '',
-          username: '',
-          biography: '',
-          email: '',
-          password: '',
-          followers: [],
-          totalFollowers: 0,
-          following: [],
-          totalFollowing: 0,
-          tweets: [],
-        },
-      },
+      paramsRoute: this.$route.params,
+      user: {},
     }
   },
   created() {
-    this.getFollowings()
-    this.getFollowers()
-    this.getTweets()
+    this.getDataUser()
   },
   methods: {
-    async getFollowings() {
-      const response = await backendApiConnection.get(
-        'followers/getFollowing/' + this.$store.state.user.info.id,
+    async getDataUser() {
+      let response = await backendApiConnection
+        .get(`/user/getUserByUsername/${this.paramsRoute.username}`, {
+          headers: {
+            'x-auth-token': this.$store.state.user.token,
+          },
+        })
+        .catch((error) => {
+          this.$router.push('/')
+        })
+      this.user = response.data
+      if (this.user.username === this.$store.state.user.info.username) {
+        this.$router.push('/profile')
+      }
+
+      response = await backendApiConnection.get(
+        'followers/getFollowing/' + this.user.id,
         {
           headers: {
             'x-auth-token': this.$store.state.user.token,
@@ -97,13 +96,12 @@ export default {
         }
       )
       if (response.status === 200) {
-        this.user.info.following = response.data
-        this.user.info.totalFollowing = response.data.length
+        this.user.following = response.data
+        this.user.totalFollowing = response.data.length
       }
-    },
-    async getFollowers() {
-      const response = await backendApiConnection.get(
-        'followers/getFollowers/' + this.$store.state.user.info.id,
+
+      response = await backendApiConnection.get(
+        'followers/getFollowers/' + this.user.id,
         {
           headers: {
             'x-auth-token': this.$store.state.user.token,
@@ -111,13 +109,12 @@ export default {
         }
       )
       if (response.status === 200) {
-        this.user.info.followers = response.data
-        this.user.info.totalFollowers = response.data.length
+        this.user.followers = response.data
+        this.user.totalFollowers = response.data.length
       }
-    },
-    async getTweets() {
-      const response = await backendApiConnection.get(
-        'tweet/getAllUserTweets/' + this.$store.state.user.info.id,
+
+      response = await backendApiConnection.get(
+        'tweet/getAllUserTweets/' + this.user.id,
         {
           headers: {
             'x-auth-token': this.$store.state.user.token,
@@ -130,6 +127,16 @@ export default {
     },
     async removeTweet(tweetId) {
       this.tweets = this.tweets.filter((x) => x.id !== tweetId)
+    },
+    async showFollowingUsers() {
+      this.$swal({
+        title: 'Following',
+        html: this.user.info.followers.user
+          .map((x) => `<p>${x.first_name} ${x.last_name}</p>`)
+          .join(''),
+        showConfirmButton: false,
+        showCloseButton: true,
+      })
     },
   },
 }
@@ -165,6 +172,12 @@ export default {
 .profileInfoWrapper {
   background: #fff;
   margin-top: -70px;
+  border-bottom: 1px solid black;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
 }
 
 .profileInfo {
@@ -197,5 +210,9 @@ export default {
 
 .tweets {
   background: #fff;
+}
+
+#dob {
+  width: 80% !important;
 }
 </style>

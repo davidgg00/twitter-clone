@@ -71,6 +71,10 @@ export default {
 
   methods: {
     async likeTweet() {
+      if (this.tweet.user.id === this.$store.state.user.info.id) {
+        return
+      }
+
       const response = await backendApiConnection.post(
         'notification/new',
         {
@@ -91,6 +95,9 @@ export default {
     },
 
     async retweet() {
+      if (this.tweet.user.id === this.$store.state.user.info.id) {
+        return
+      }
       const response = await backendApiConnection.post(
         'notification/new',
         {

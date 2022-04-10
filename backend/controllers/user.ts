@@ -77,6 +77,23 @@ export const getUser = async (req: Request, res: Response) => {
   }
 };
 
+export const getUserDataByUsername = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findOne({
+      where: {
+        username: req.params.username,
+      },
+    });
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };

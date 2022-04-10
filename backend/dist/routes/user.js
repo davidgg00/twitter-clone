@@ -12,6 +12,7 @@ const router = (0, express_1.Router)();
 router.post("/login", user_1.login);
 router.post("/register", user_1.register);
 router.get("/getUser/:id", [jwt_validation_1.default], user_1.getUser);
+router.get("/getUserByUsername/:username", [jwt_validation_1.default], user_1.getUserDataByUsername);
 router.get("/getAllUsers", [jwt_validation_1.default], user_1.getAllUsers);
 router.put("/updateUser/:id", [
     jwt_validation_1.default,

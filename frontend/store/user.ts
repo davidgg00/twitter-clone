@@ -17,6 +17,12 @@ export const mutations = {
     state.info = {}
     state.token = ''
   },
+  updateUser(state: { info: any; token: any }, data: any) {
+    state.info.first_name = data.first_name
+    state.info.last_name = data.last_name
+    state.info.bio = data.bio
+    state.info.dob = data.dob
+  },
 }
 
 export const actions = {
@@ -28,7 +34,7 @@ export const actions = {
       commit('setUser', data)
       return { ok: true }
     } catch (error: any) {
-      console.log(error)
+      console.log('----4')
       return { ok: false, message: error.response.data.message }
     }
   },

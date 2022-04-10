@@ -3,6 +3,7 @@ import {
   deleteUser,
   getAllUsers,
   getUser,
+  getUserDataByUsername,
   login,
   register,
   updateUser,
@@ -16,6 +17,11 @@ const router = Router();
 router.post("/login", login);
 router.post("/register", register);
 router.get("/getUser/:id", [jwtValidation], getUser);
+router.get(
+  "/getUserByUsername/:username",
+  [jwtValidation],
+  getUserDataByUsername
+);
 router.get("/getAllUsers", [jwtValidation], getAllUsers);
 router.put(
   "/updateUser/:id",
